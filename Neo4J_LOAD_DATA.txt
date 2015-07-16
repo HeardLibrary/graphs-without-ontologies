@@ -4,7 +4,7 @@ DASH
 LOAD NODES:
  
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/Work.csv" AS csvLine
-CREATE (a:Work { id: csvLine.RecordIdentifier, title: csvLine.Title, date: toInt(csvLine.Date), publisher: csvLine.Publisher, language: csvLine:Language, type: csvLineType, department: csvLine.Department })
+CREATE (w:Work { id: csvLine.RecordIdentifier, title: csvLine.Title, date: toInt(csvLine.Date), publisher: csvLine.Publisher, language: csvLine.Language, type: csvLine.Type, department: csvLine.Department })
  
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/Author.csv" AS csvLine
 CREATE (p:Person { id: csvLine.AuthID, name: csvLine.Author })
@@ -20,6 +20,6 @@ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graph
 MATCH (person:Person {id: csvLine.authID}),(work:Work { id: csvLine.RecordIdentifier})
 CREATE person-[:WROTE]->work
 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/EdWarga/VUIR-Data-Project/master/Divinity/Topic-rel.csv" AS csvLine
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/TopicREL.csv" AS csvLine
 MATCH (work:Work {id: csvLine.RecordIdentifier}),(topic:Topic {id: csvLine.TopicID})
 CREATE work-[:ISABOUT]->topic
