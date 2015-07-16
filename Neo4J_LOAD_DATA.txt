@@ -3,14 +3,11 @@ DASH
  
 LOAD NODES:
  
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/Work.csv" AS csvLine
-CREATE (w:Work { id: csvLine.RecordIdentifier, title: csvLine.Title, date: toInt(csvLine.Date), publisher: csvLine.Publisher, language: csvLine.Language, type: csvLine.Type, department: csvLine.Department })
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Work.csv" AS csvLine CREATE (w:Work { id: csvLine.RecordIdentifier, title: csvLine.Title, date: toInt(csvLine.Date), publisher: csvLine.Publisher, language: csvLine.Language, type: csvLine.Type, department: csvLine.Department });
  
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/Author.csv" AS csvLine
-CREATE (p:Person { id: csvLine.AuthID, name: csvLine.Author })
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (p:Person { id: csvLine.AuthID, name: csvLine.Author });
  
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/BuildGraph/Topic.csv" AS csvLine
-CREATE (t:Topic { id: csvLine.topicID, topic: csvLine.Topic })
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (t:Topic { id: csvLine.topicID, topic: csvLine.Topic });
  
 ---------------------------------------------------------------------------
  
@@ -18,11 +15,7 @@ LOAD RELATIONSHIPS:
  
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorREL.csv" AS csvLine MATCH (person:Person {id: csvLine.authID}),(work:Work {id: csvLine.RecordIdentifier}) CREATE person-[:WROTE]->work;
 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicREL.csv" AS csvLine
-MATCH (work:Work {id: csvLine.RecordIdentifier}),(topic:Topic {id: csvLine.TopicID})
-CREATE work-[:ISABOUT]->topic
-
-
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicREL.csv" AS csvLine MATCH (work:Work {id: csvLine.RecordIdentifier}),(topic:Topic {id: csvLine.TopicID}) CREATE work-[:ISABOUT]->topic
 
 
 
