@@ -14,18 +14,12 @@ declare function local:matches-any
    satisfies ($arg = $searchString)
  } ;
 
-let $DB := fn:collection("OAI")
-
-let $head := "RecordIdentifier|Date|Title|Publisher|Language|Type|Department"
-
-
-return
-
-($head,
 let $records := fn:collection("OAI")//oai:record
-for $individual in $records
 
-(:Record Identifier:)
+let $node:=
+element workList{
+  for $individual in $records 
+  (:Record Identifier:)
 let $recordIDpath := $individual//oai:identifier/text()
 
 let $recordID :=
@@ -117,9 +111,17 @@ let $department :=
     else if ((count($departmentPath)) > 1)
     then (fn:string-join(($departmentPath), "; "))
     else ($departmentPath)        
-
-let $line := fn:string-join(($recordID, $date, $title, $publisher, $lang, $type, $department), '|')
-
+  
 return
- $line)
+element work{
+element recordIdentifier {$recordID},
+element date {$date},
+element title {$title},
+element publisher {$publisher},
+element language {$lang},
+element type {$type},
+element department {$department}
+}
+}
 
+return csv:serialize($node)
