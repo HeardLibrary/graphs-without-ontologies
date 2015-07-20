@@ -19,4 +19,4 @@ let $csv := element CSV{
 }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/TopicWrite.csv", $serialize)
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/Topic.csv", $serialize)

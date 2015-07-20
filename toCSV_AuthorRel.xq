@@ -23,4 +23,4 @@ let $csv := element CSV{
 }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/AuthorRelsWrite.csv", $serialize)
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/AuthorRels.csv", $serialize)

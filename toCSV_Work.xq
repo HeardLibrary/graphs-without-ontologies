@@ -20,16 +20,6 @@ let $records := fn:collection("OAI")//oai:record
         for $individual in $records
             (:Record Identifier:)
             let $recordID := $individual//oai:identifier/text()
-                
-            (:Creator:)
-            let $creatorPath := for $each in ($individual//dc:creator/text()) return fn:normalize-space($each)
-            
-            let $creator :=
-                if ((count($creatorPath)) > 1)
-                then (fn:string-join(($creatorPath), "; "))
-                else ($creatorPath)
-            
-            
             (:Date:)
             let $datePath := for $each in $individual//dc:date[fn:not(fn:contains(., "T"))]/text() return fn:substring($each, 1, 4)          
             let $date :=
@@ -53,14 +43,6 @@ let $records := fn:collection("OAI")//oai:record
                 then (fn:string-join(($publisherPath), "; "))
                 else ($publisherPath)
             
-            (:Subject:)
-            let $subjectPath := $individual//dc:subject/text()
-            
-            let $subject :=
-                if ((count($subjectPath)) > 1)
-                then (fn:string-join(($subjectPath), "; "))
-                else ($subjectPath)  
-                
             (:Language:)
             let $langPath := $individual//dc:language/text()
             
@@ -99,4 +81,5 @@ let $records := fn:collection("OAI")//oai:record
             }
        }
 
-return csv:serialize($csv, map{'header':true()})
+let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/Work.csv", $serialize)

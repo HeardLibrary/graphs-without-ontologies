@@ -17,9 +17,9 @@ let $csv := element CSV{
 for $topic in $topics return
     element record{
       element recordIdentifier {$recordID},
-      element creatorID {$topic}
+      element topicID {$topic}
   }
 }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/TopicRelWrite.csv", $serialize)
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/TopicRel.csv", $serialize)
