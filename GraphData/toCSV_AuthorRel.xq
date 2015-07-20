@@ -13,17 +13,12 @@ declare function local:matches-any
    some $searchString in $searchStrings
    satisfies ($arg = $searchString)
  } ;
-
 let $DB := fn:collection("OAI")
 
-let $head := "RecordIdentifier|Author"
-
+let $node := element CSV{
+  for $individual in $DB//oai:record
 
 return
-
-($head,
-let $records := fn:collection("OAI")//oai:record
-for $individual in $records
 
 (:Record Identifier:)
 let $recordIDpath := $individual//oai:identifier/text()
@@ -37,10 +32,16 @@ let $recordID :=
     
 (:Creator:)
 let $creators := for $each in ($individual//dc:creator/text()) return fn:normalize-space($each)
-       
-for $creator in $creators
-let $line := $recordID||"|"||$creator
 
 return
- $line)
+for $each in $creators
+return
+element record{
+element recordIdentifier {$recordID},
+element creatorID {$each}
+}
+}
+
+return csv:serialize($node, map{'header':true()})
+  
 
