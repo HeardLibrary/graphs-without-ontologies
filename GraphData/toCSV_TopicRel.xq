@@ -3,43 +3,23 @@ xquery version "3.1";
 declare namespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
 declare namespace oai = "http://www.openarchives.org/OAI/2.0/";
 declare namespace oai_dc = "http://www.openarchives.org/OAI/2.0/oai_dc/";
-declare namespace qdc = "http://purl.org/dc/terms/";
-declare namespace dc = "http://purl.org/dc/elements/1.1/";
+declare namespace dc = "http://purl.org/dc/elements/1.1/";  
 
-declare function local:matches-any
-  ( $arg as xs:string ,
-    $searchStrings as xs:string* )  as xs:boolean {
-   some $searchString in $searchStrings
-   satisfies ($arg = $searchString)
- } ;
-
-let $DB := fn:collection("OAI")
-
-let $head := "RecordIdentifier|Topic"
-
-
-return
-
-($head,
 let $records := fn:collection("OAI")//oai:record
-for $individual in $records
 
-(:Record Identifier:)
-let $recordIDpath := $individual//oai:identifier/text()
-
-let $recordID :=
-    if (fn:empty($recordIDpath))
-    then ("NULL")
-    else if ((count($recordIDpath)) > 1)
-    then (fn:string-join(($recordIDpath), "; "))
-    else ($recordIDpath)
-    
-(:Creator:)
-let $topics := for $each in ($individual//dc:subject/text()) return fn:normalize-space($each)
+let $csv := element CSV{
+  for $record in $records
+  (:Record Identifier:)
+  let $recordID := $record//oai:identifier/text()
+  (:Topics:)
+  let $topics := for $each in ($record//dc:subject/text()) return fn:normalize-space($each)
        
-for $topic in $topics
-let $line := $recordID||"|"||$topic
+for $topic in $topics return
+    element record{
+      element recordIdentifier {$recordID},
+      element creatorID {$topic}
+  }
+}
 
-return
- $line)
-
+let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/TopicRelWrite.csv", $serialize)

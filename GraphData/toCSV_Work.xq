@@ -15,37 +15,25 @@ declare function local:matches-any
 
 let $records := fn:collection("OAI")//oai:record
 
-  let csv:=
+  let $csv:=
     element workList{
         for $individual in $records
             (:Record Identifier:)
-            let $recordIDpath := $individual//oai:identifier/text()
-            
-            let $recordID :=
-                if (fn:empty($recordIDpath))
-                then ("NULL")
-                else if ((count($recordIDpath)) > 1)
-                then (fn:string-join(($recordIDpath), "; "))
-                else ($recordIDpath)
+            let $recordID := $individual//oai:identifier/text()
                 
             (:Creator:)
             let $creatorPath := for $each in ($individual//dc:creator/text()) return fn:normalize-space($each)
             
             let $creator :=
-                if (fn:empty($creatorPath))
-                then ("NULL")
-                else if ((count($creatorPath)) > 1)
+                if ((count($creatorPath)) > 1)
                 then (fn:string-join(($creatorPath), "; "))
                 else ($creatorPath)
             
             
             (:Date:)
-            let $datePath := $individual//dc:date[fn:not(fn:contains(., "T"))]/text()
-            
+            let $datePath := for $each in $individual//dc:date[fn:not(fn:contains(., "T"))]/text() return fn:substring($each, 1, 4)          
             let $date :=
-                if (fn:empty($datePath))
-                then ("NULL")
-                else if ((count($datePath)) > 1)
+                if ((count($datePath)) > 1)
                 then (fn:string-join(($datePath), "; "))
                 else ($datePath)    
             
@@ -53,9 +41,7 @@ let $records := fn:collection("OAI")//oai:record
             let $titlePath := for $each in ($individual//dc:title/text()) return fn:normalize-space($each)
             
             let $title :=
-                if (fn:empty($titlePath))
-                then ("NULL")
-                else if ((count($titlePath)) > 1)
+                if ((count($titlePath)) > 1)
                 then (fn:string-join(($titlePath), "; "))
                 else ($titlePath)
             
@@ -63,9 +49,7 @@ let $records := fn:collection("OAI")//oai:record
             let $publisherPath := for $each in ($individual//dc:publisher/text())  return fn:normalize-space($each)
             
             let $publisher :=
-                if (fn:empty($publisherPath))
-                then ("NULL")
-                else if ((count($publisherPath)) > 1)
+                if ((count($publisherPath)) > 1)
                 then (fn:string-join(($publisherPath), "; "))
                 else ($publisherPath)
             
@@ -73,9 +57,7 @@ let $records := fn:collection("OAI")//oai:record
             let $subjectPath := $individual//dc:subject/text()
             
             let $subject :=
-                if (fn:empty($subjectPath))
-                then ("NULL")
-                else if ((count($subjectPath)) > 1)
+                if ((count($subjectPath)) > 1)
                 then (fn:string-join(($subjectPath), "; "))
                 else ($subjectPath)  
                 
@@ -83,9 +65,7 @@ let $records := fn:collection("OAI")//oai:record
             let $langPath := $individual//dc:language/text()
             
             let $lang :=
-                if (fn:empty($langPath))
-                then ("NULL")
-                else if ((count($langPath)) > 1)
+                if ((count($langPath)) > 1)
                 then (fn:string-join(($langPath), "; "))
                 else ($langPath) 
             
@@ -93,9 +73,7 @@ let $records := fn:collection("OAI")//oai:record
             let $typePath := $individual//dc:type/text()
                 
             let $type :=
-                if (fn:empty($typePath))
-                then ("NULL")
-                else if ((count($typePath)) > 1)
+                if ((count($typePath)) > 1)
                 then (fn:string-join(($typePath), "; "))
                 else ($typePath)     
             
@@ -105,9 +83,7 @@ let $records := fn:collection("OAI")//oai:record
             let $departmentPath := $individual//dc:description[local:matches-any(., $dept)]/text()
             
             let $department :=
-                if (fn:empty($departmentPath))
-                then ("NULL")
-                else if ((count($departmentPath)) > 1)
+                if ((count($departmentPath)) > 1)
                 then (fn:string-join(($departmentPath), "; "))
                 else ($departmentPath)    
 
