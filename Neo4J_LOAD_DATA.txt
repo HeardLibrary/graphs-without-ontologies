@@ -11,15 +11,10 @@ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graph
  
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (t:Topic { topic: csvLine.topic });
  
----------------------------------------------------------------------------
+------------------------------------------------------------------------
  
 LOAD RELATIONSHIPS:
  
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorREL.csv" AS csvLine MATCH (person:Person {id: csvLine.creatorID}),(work:Work {id: csvLine.recordIdentifier}) CREATE person-[:WROTE]->work;
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (person:Person {id: csvLine.creatorID}),(work:Work {id: csvLine.recordIdentifier}) CREATE person-[:WROTE]->work;
 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicREL.csv" AS csvLine MATCH (work:Work {id: csvLine.RecordIdentifier}),(topic:Topic {id: csvLine.TopicID}) CREATE work-[:ISABOUT]->topic
-
-
-
-
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TESTdataRel" AS csvLine MATCH (person:Person {id: csvLine.authID}),(work:Work {id: csvLine.RecordIdentifier}) CREATE person-[:WROTE]->work;
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.RecordIdentifier}),(topic:Topic {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic
