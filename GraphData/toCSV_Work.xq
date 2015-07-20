@@ -124,4 +124,4 @@ element department {$department}
 }
 }
 
-return csv:serialize($node)
+return csv:serialize($node, map{'header':true()})
