@@ -55,7 +55,7 @@ properties of work: recordIdentifier,date,title,publisher,language,type,departme
 	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Work.csv" AS csvLine CREATE (w:Work { id: csvLine.recordIdentifier, title: csvLine.title, date: csvLine.date, publisher: csvLine.publisher, language: csvLine.language, type: csvLine.type, department: csvLine.department });
  
  properties of creator: name
-	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {id: csvLine.name});
+	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {name: csvLine.name});
  
  properties of subject: topic
 	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (t:Subject { topic: csvLine.topic });
@@ -66,7 +66,7 @@ LOAD RELATIONSHIPS:
 
 person-CREATED->work
  
-	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (p:Person {name: csvLine.creatorID}),(w:Work {id: csvLine.recordIdentifier}) CREATE p-[:Created]->w;
+	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator {name: csvLine.creatorID}),(w:Work {id: csvLine.recordIdentifier}) CREATE c-[:Created]->w;
 
 	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
 
@@ -102,6 +102,11 @@ neo4j-sh (?)$
 * CREATE INDEX ON :Person(name);
 * CREATE INDEX ON :Work(title);
 
-CREATE CONSTRAINT ON (c.Creator) ASSERT c.id IS UNIQUE;
+CREATE CONSTRAINT ON (c:Creator) ASSERT c.name IS UNIQUE;
 
+match (c:Creator {name: 'Griffin, James D.'}) delete c limit 1;
+-------
+this worked:
+LOAD CSV WITH HEADERS FROM "https://gist.githubusercontent.com/EdWarga/1d1a9e21812910b71c99/raw/b4420ed44fdbb74c8e39e7e656ef850b21b1eb22/TestData" AS csvLine MERGE (c:Creator { name:  coalesce(csvLine.CREATORID, "No Name")}) MERGE (w:WORK { name: csvLine.recordIdentifier}) MERGE (c)-[:Created]->(w);
 
+Thanks to : http://stackoverflow.com/questions/26090984/create-neo4j-database-using-csv-files
