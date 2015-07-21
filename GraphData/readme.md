@@ -50,15 +50,15 @@ LOAD CODE FOR NEO4J
 --------------------------------------------
 LOAD NODES:
 
-properties of work: '''recordIdentifier,date,title,publisher,language,type,department
+properties of work: recordIdentifier,date,title,publisher,language,type,department
  
-	'''LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Work.csv" AS csvLine CREATE (w:Work { id: csvLine.recordIdentifier, title: csvLine.title, date: csvLine.date, publisher: csvLine.publisher, language: csvLine.language, type: csvLine.type, department: csvLine.department });
+	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Work.csv" AS csvLine CREATE (w:Work { id: csvLine.recordIdentifier, title: csvLine.title, date: csvLine.date, publisher: csvLine.publisher, language: csvLine.language, type: csvLine.type, department: csvLine.department });
  
- properties of creator: '''name
-	'''LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {name: csvLine.creator});
+ properties of creator: name
+	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {id: csvLine.name});
  
- properties of subject: '''topic
-	'''LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (t:Subject { topic: csvLine.topic });
+ properties of subject: topic
+	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (t:Subject { topic: csvLine.topic });
  
 ------------------------------------------------------------------------
  
@@ -66,20 +66,20 @@ LOAD RELATIONSHIPS:
 
 person-CREATED->work
  
-	'''LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (p:Person {name: csvLine.creatorID}),(w:Work {id: csvLine.recordIdentifier}) CREATE p-[:Created]->w;
+	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (p:Person {name: csvLine.creatorID}),(w:Work {id: csvLine.recordIdentifier}) CREATE p-[:Created]->w;
 
-	'''LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Topic {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topicID
+	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
 
 ------------------------------------------------------------------------
 
 !issues!
 1. loading relationships is giving me grief. I loaded the three sets of nodes - works, people, topic
-	'''neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Topic {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic
+	neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Topic {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic
 	> ;
 	SSLException: Connection has been shutdown: javax.net.ssl.SSLException: java.net.SocketException: Connection reset
 neo4j-sh (?)$ 
 	- Progress:
-	'''neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (person:Person {name: csvLine.creatorID}),(work:Work {id: csvLine.recordIdentifier}) CREATE person-[:WROTE]->work;
+	neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (person:Person {name: csvLine.creatorID}),(work:Work {id: csvLine.recordIdentifier}) CREATE person-[:WROTE]->work;
 	+--------------------------------------------+
 	| No data returned, and nothing was changed. |
 	+--------------------------------------------+
@@ -96,5 +96,12 @@ neo4j-sh (?)$
 	- for instance. creators could be identified in some way - perhaps with ORCIDs [http://orcid.org/].
 	- can we link the reopository to other profiles like ORCID or other systems like faculty pages (remembered conversation:CalTech provides code for widget that serves repository data on faculty pages and other websites - php?)
 
-	
+------------------------------------------------------------------------
+##Importing CSV file with Cypher
+* http://neo4j.com/docs/stable/cypherdoc-importing-csv-files-with-cypher.html
+* CREATE INDEX ON :Person(name);
+* CREATE INDEX ON :Work(title);
+
+CREATE CONSTRAINT ON (c.Creator) ASSERT c.id IS UNIQUE;
+
 
