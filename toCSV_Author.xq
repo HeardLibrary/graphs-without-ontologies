@@ -14,7 +14,7 @@ let $csv := element CSV{
   order by $creator  
   return
     element record{
-      element creator {fn:normalize-space($creator)}
+      element name {fn:normalize-space($creator)}
   }
 }
 
