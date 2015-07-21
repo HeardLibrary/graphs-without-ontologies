@@ -8,13 +8,13 @@ declare namespace dc = "http://purl.org/dc/elements/1.1/";
 let $records := fn:collection("OAI")//oai:record
 
 let $csv := element CSV{
-  for $record in $records
-  (:Creator:)
-  let $creators := for $each in ($record//dc:creator/text()) return fn:normalize-space($each)
+  let $creators :=  fn:distinct-values($records//dc:creator)
 
-  for $creator in $creators return
+  for $creator in $creators 
+  order by $creator  
+  return
     element record{
-      element creator {$creator}
+      element creator {fn:normalize-space($creator)}
   }
 }
 

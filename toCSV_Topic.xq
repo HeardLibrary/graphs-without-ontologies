@@ -8,13 +8,14 @@ declare namespace dc = "http://purl.org/dc/elements/1.1/";
 let $records := fn:collection("OAI")//oai:record
 
 let $csv := element CSV{
-  for $record in $records
-  (:TOPIC:)
-  let $topics := for $each in ($record//dc:subject/text()) return fn:normalize-space($each)
 
-  for $topic in $topics return
+  let $topics := fn:distinct-values($records//dc:subject/text())
+
+  for $topic in $topics 
+  order by $topic 
+  return
     element record{
-      element topic {$topic}
+      element topic {fn:normalize-space($topic)}
   }
 }
 
