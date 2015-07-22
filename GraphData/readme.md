@@ -35,9 +35,11 @@ properties of work: recordIdentifier,date,title,publisher,language,type,departme
 	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Work.csv" AS csvLine CREATE (w:Work { id: csvLine.recordIdentifier, title: csvLine.title, date: csvLine.date, publisher: csvLine.publisher, language: csvLine.language, type: csvLine.type, department: csvLine.department });
  
  properties of creator: '''name
+ 
 	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {id: csvLine.ID, name: csvLine.name});
  
  properties of subject: '''subject
+ 
 	LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Topic.csv" AS csvLine CREATE (s:Subject { subject: csvLine.topic });
  
 ------------------------------------------------------------------------
