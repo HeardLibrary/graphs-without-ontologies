@@ -68,7 +68,7 @@ LOAD RELATIONSHIPS:
 
 person-CREATED->work
  
-	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) MERGE (c:Creator { name:  coalesce(csvLine.creatorID, "No Name")}) CREATE (c)-[:Created]->(w);
+	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}), (w:WORK { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
 
 	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
 
@@ -100,7 +100,7 @@ new approach...
 
 
 
-neo4j-sh (?)$ USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) CREATE (c:Creator { name: csvLine.creatorID}) CREATE (c)-[:Created]->(w);
+neo4j-sh (?)$ USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) MERGE (c:Creator { name:  coalesce(csvLine.creatorID, "No Name")}) CREATE (c)-[:Created]->(w);
 +-------------------+
 | No data returned. |
 +-------------------+
@@ -205,3 +205,72 @@ we then wrote some more XQuery to serialize the data into CSV formats neo4j coul
 
 we loaded the data into neo4j using cypher commands and the the neo4j-shell interface.
 ---------------
+
+
+
+#stackOverflow Question
+This worked fine for me:
+
+USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
+
+
+
+But this very similar scenario is not working for me:
+
+neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}), (w:WORK { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
++--------------------------------------------+
+| No data returned, and nothing was changed. |
++--------------------------------------------+
+493 ms
+neo4j-sh (?)$ 
+
+
+* This part works, but it breaks down because of NULL values in the CSV creatorID/name field...:
+
+neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine return csvLine;
++-------------------------------------------------------------------------------------------------+
+| csvLine                                                                                         |
++-------------------------------------------------------------------------------------------------+
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2031670",  creatorID -> "Shieber, Stuart"}         |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2019322",  creatorID -> "Shieber, Stuart"}         |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Marks, Joe"}              |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Shieber, Stuart"}         |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Johari, Ramesh"}          |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Partovi, Ali"}            |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2026618",  creatorID -> "Shieber, Stuart"}         |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2027194",  creatorID -> "Hobbs, Jerry"}            |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2027194",  creatorID -> "Shieber, Stuart"}         |
+| {recordIdentifier -> "oai:dash.harvard.edu:1/2027199",  creatorID -> "Moore, Robert C."}        |
+...
+
+
+but this fails:
+
+neo4j-sh (?)$ USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) MERGE (c:Creator { name:  coalesce(csvLine.creatorID, "No Name")}) CREATE (c)-[:Created]->(w);
++-------------------+
+| No data returned. |
++-------------------+
+Nodes created: 1
+Relationships created: 52
+Properties set: 1
+Labels added: 1
+998 ms
+
+neo4j-sh (?)$ match (c)-[r:Created]->(w) return c,r,w limit 10;
++--------------------------------------------------------------------------------------------------------+
+| c                            | r                 | w                                                   |
++--------------------------------------------------------------------------------------------------------+
+| Node[278478]{name:"No Name"} | :Created[26273]{} | Node[278029]{name:"oai:dash.harvard.edu:1/2031670"} |
+| Node[278478]{name:"No Name"} | :Created[26272]{} | Node[278030]{name:"oai:dash.harvard.edu:1/2019322"} |
+| Node[278478]{name:"No Name"} | :Created[26275]{} | Node[278031]{name:"oai:dash.harvard.edu:1/2031713"} |
+| Node[278478]{name:"No Name"} | :Created[26274]{} | Node[278031]{name:"oai:dash.harvard.edu:1/2031713"} |
+| Node[278478]{name:"No Name"} | :Created[26277]{} | Node[278031]{name:"oai:dash.harvard.edu:1/2031713"} |
+| Node[278478]{name:"No Name"} | :Created[26276]{} | Node[278031]{name:"oai:dash.harvard.edu:1/2031713"} |
+| Node[278478]{name:"No Name"} | :Created[26279]{} | Node[278032]{name:"oai:dash.harvard.edu:1/2026618"} |
+| Node[278478]{name:"No Name"} | :Created[26278]{} | Node[278033]{name:"oai:dash.harvard.edu:1/2027194"} |
+| Node[278478]{name:"No Name"} | :Created[26281]{} | Node[278033]{name:"oai:dash.harvard.edu:1/2027194"} |
+| Node[278478]{name:"No Name"} | :Created[26280]{} | Node[278034]{name:"oai:dash.harvard.edu:1/2027199"} |
++--------------------------------------------------------------------------------------------------------+
+10 rows
+126 ms
+
