@@ -90,15 +90,33 @@ Thanks to : http://stackoverflow.com/questions/26090984/create-neo4j-database-us
 
 ----------------------
 
-new approach...
+new approach... NOPE
 
 	i have loaded topic nodes and work nodes.
 	i have loaded :Work-:ISABOUT->:Subject relationships
 	now delee all :Creator nodes
 	then load author rels match on recordIDs and MERGE on Names
 
+------------------------------------
+TEST
+
+https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/TEST/Author.csv
+
+https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/TEST/AuthorRel.csv
 
 
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {name: csvLine.name});
+
+
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}), (w:WORK { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
+
+
+
+
+
+
+
+------------------------------------------
 
 neo4j-sh (?)$ USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) MERGE (c:Creator { name:  coalesce(csvLine.creatorID, "No Name")}) CREATE (c)-[:Created]->(w);
 +-------------------+
@@ -209,7 +227,7 @@ we loaded the data into neo4j using cypher commands and the the neo4j-shell inte
 
 
 #stackOverflow Question
-This worked fine for me:
+I'm loading relationships into neo4j. This worked fine for me:
 
 USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
 
@@ -225,26 +243,19 @@ neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Hear
 neo4j-sh (?)$ 
 
 
-* This part works, but it breaks down because of NULL values in the CSV creatorID/name field...:
+* This part works,
 
 neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine return csvLine;
-+-------------------------------------------------------------------------------------------------+
-| csvLine                                                                                         |
-+-------------------------------------------------------------------------------------------------+
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2031670",  creatorID -> "Shieber, Stuart"}         |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2019322",  creatorID -> "Shieber, Stuart"}         |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Marks, Joe"}              |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Shieber, Stuart"}         |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Johari, Ramesh"}          |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2031713",  creatorID -> "Partovi, Ali"}            |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2026618",  creatorID -> "Shieber, Stuart"}         |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2027194",  creatorID -> "Hobbs, Jerry"}            |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2027194",  creatorID -> "Shieber, Stuart"}         |
-| {recordIdentifier -> "oai:dash.harvard.edu:1/2027199",  creatorID -> "Moore, Robert C."}        |
-...
 
+and this works
 
-but this fails:
+neo4j-sh (?)$ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:Work { id: csvLine.recordIdentifier}) return w;
+
+but it breaks down when I try to MATCH on :Creator name:
+
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}) return c; 
+
+I got an error message about NULL valueus, so I tried this (from http://stackoverflow.com/questions/26090984/create-neo4j-database-using-csv-files):
 
 neo4j-sh (?)$ USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (w:WORK { name: csvLine.recordIdentifier}) MERGE (c:Creator { name:  coalesce(csvLine.creatorID, "No Name")}) CREATE (c)-[:Created]->(w);
 +-------------------+
@@ -257,9 +268,7 @@ Labels added: 1
 998 ms
 
 neo4j-sh (?)$ match (c)-[r:Created]->(w) return c,r,w limit 10;
-+--------------------------------------------------------------------------------------------------------+
-| c                            | r                 | w                                                   |
-+--------------------------------------------------------------------------------------------------------+
+
 | Node[278478]{name:"No Name"} | :Created[26273]{} | Node[278029]{name:"oai:dash.harvard.edu:1/2031670"} |
 | Node[278478]{name:"No Name"} | :Created[26272]{} | Node[278030]{name:"oai:dash.harvard.edu:1/2019322"} |
 | Node[278478]{name:"No Name"} | :Created[26275]{} | Node[278031]{name:"oai:dash.harvard.edu:1/2031713"} |
@@ -270,7 +279,11 @@ neo4j-sh (?)$ match (c)-[r:Created]->(w) return c,r,w limit 10;
 | Node[278478]{name:"No Name"} | :Created[26278]{} | Node[278033]{name:"oai:dash.harvard.edu:1/2027194"} |
 | Node[278478]{name:"No Name"} | :Created[26281]{} | Node[278033]{name:"oai:dash.harvard.edu:1/2027194"} |
 | Node[278478]{name:"No Name"} | :Created[26280]{} | Node[278034]{name:"oai:dash.harvard.edu:1/2027199"} |
-+--------------------------------------------------------------------------------------------------------+
-10 rows
-126 ms
+
+
+The name data is not being picked up from the CSV. Please advise.
+---------------
+
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine
+MATCH (work:Work {id: csvLine.recordIdentifier}),(creator:Creator {id: csvLine.CreatorID}) CREATE work<-[:Wrote]-creator
 
