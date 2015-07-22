@@ -68,7 +68,7 @@ LOAD RELATIONSHIPS:
 
 person-CREATED->work
  
-	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}), (w:WORK { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
+	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { id: csvLine.creatorID}), (w:Work { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
 
 	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/TopicRel.csv" AS csvLine MATCH (work:Work {id: csvLine.recordIdentifier}),(topic:Subject {topic: csvLine.topicID}) CREATE work-[:ISABOUT]->topic;
 
@@ -76,8 +76,8 @@ person-CREATED->work
 ---------------------------------------------------------
 ##Importing CSV file with Cypher
 * http://neo4j.com/docs/stable/cypherdoc-importing-csv-files-with-cypher.html
-* CREATE INDEX ON :Person(name);
-* CREATE INDEX ON :Work(title);
+* CREATE INDEX ON :Creator(id);
+* CREATE INDEX ON :Work(id);
 
 CREATE CONSTRAINT ON (c:Creator) ASSERT c.name IS UNIQUE;
 
@@ -105,10 +105,10 @@ https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/
 https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/TEST/AuthorRel.csv
 
 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Author.csv" AS csvLine CREATE (c:Creator {name: csvLine.name});
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/TEST/Author.csv" AS csvLine CREATE (c:Creator {name: csvLine. name});
 
 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/AuthorRel.csv" AS csvLine MATCH (c:Creator { name: csvLine.creatorID}), (w:WORK { id: csvLine.recordIdentifier}) CREATE c-[:CREATED]->w;
+match 
 
 
 
@@ -194,6 +194,9 @@ neo4j-sh (?)$
 		- https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records#cite_note-3.2-1
 		- Work: a "distinct intellectual or artistic creation."[1] 
 			- [1]<ref name="3.2">{{cite web|url=http://www.ifla.org/VII/s13/frbr/frbr1.htm#3.2|title=Functional Requirements for Bibliographic Records - Final Report - Part 1|publisher=ifla.org|accessdate=15 April 2014}}</ref>
+
+
+			
 
 ---------------
 
