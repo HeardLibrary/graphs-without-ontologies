@@ -8,12 +8,17 @@ declare namespace dc = "http://purl.org/dc/elements/1.1/";
 let $records := fn:collection("OAI")//oai:record
 
 let $csv := element CSV{
-  let $creators :=  fn:distinct-values($records//dc:creator)
+  
+  (:Creator:)
+  let $creators :=  fn:distinct-values($records//dc:creator ! fn:normalize-space(.))
+  
 
-  for $creator in $creators 
+  for $creator in $creators
+  let $creatorID := convert:string-to-hex($creator)
   order by $creator  
   return
     element record{
+      element ID {$creatorID},
       element name {fn:normalize-space($creator)}
   }
 }

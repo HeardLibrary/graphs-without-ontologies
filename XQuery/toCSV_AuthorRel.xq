@@ -12,13 +12,13 @@ let $csv := element CSV{
   (:Record Identifier:)
   let $recordID := $record//oai:identifier/text()
     
-  (:Creator:)
-  let $creators := for $each in ($record//dc:creator/text()) return fn:normalize-space($each)
+  (:Creator ID:)
+  let $creatorIDs := for $each in ($record//dc:creator/text()) return fn:normalize-space($each) => convert:string-to-hex()
 
-  for $creator in $creators return
+  for $creatorID in $creatorIDs return
     element record{
       element recordIdentifier {$recordID},
-      element creatorID {$creator}
+      element creatorID {$creatorID}
   }
 }
 
