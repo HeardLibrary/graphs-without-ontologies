@@ -3,6 +3,14 @@
 ###Journal Publishing Profiles
 
 ```cypher
+//show distinct publishers with number of articles published
+match (w:Work)
+where w.publisher <> "null"
+return distinct(w.publisher) as Publishers, count(*) as Articles
+order by Articles desc
+```
+
+```cypher
 match (w:Work {publisher:"Elsevier"})
 where  w.department <> "null"
 return w.department as Department, count(*) as Articles
