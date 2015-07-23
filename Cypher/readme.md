@@ -26,6 +26,17 @@ return w.department as Department, count(*) as Articles
 order by Articles
 ```
 
+###Items with Co-Authors
+
+```cypher
+//show titles with most co-authors
+match (a:Work)<-[b]-(c:Creator)
+where a.title <> "null" 
+with a.title as Title, count(c) as Authors
+return Title, Authors
+order by Authors descending
+```
+
 ###Recommendation Engine
 The following queries are adapted from [Building a Recommendation Engine with Cypher in Two Minutes](http://neo4j.com/developer/guide-build-a-recommendation-engine/).
 
