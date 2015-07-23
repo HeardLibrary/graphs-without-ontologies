@@ -48,16 +48,16 @@ properties of :Work -  recordIdentifier, date, title, publisher, language, type,
 	USING PERIODIC COMMIT 500 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/HeardLibrary/graphs-without-ontologies/master/GraphData/Subject.csv" AS csvLine CREATE (s:Subject { subject: csvLine.subject });
  
 ------------------------- 
-INDEX and CONSTRATINTS
+CONSTRATINTS
 -------------------------
-	CREATE INDEX ON :Creator(id);
-	CREATE INDEX ON :Work(id);
-	CREATE INDEX ON :Subject(subject);
 
-	CREATE CONSTRAINT ON (w.Work) ASSERT w.id IS UNIQUE;
+	CREATE CONSTRAINT ON (w:Work) ASSERT w.id IS UNIQUE;
 	CREATE CONSTRAINT ON (c:Creator) ASSERT c.id IS UNIQUE;
 	CREATE CONSTRAINT ON (s:Subject) ASSERT s.subject IS UNIQUE;
-
+	{ISSUE: neo4j-sh (?)$ CREATE CONSTRAINT ON (s:Subject) ASSERT s.subject IS UNIQUE;
+	QueryExecutionKernelException: Unable to create CONSTRAINT ON ( subject:Subject ) ASSERT subject.subject IS UNIQUE:
+	Multiple nodes with label `Subject` have property `subject` = 'atomic layer deposition}
+	
 -------------------------
 LOAD RELATIONSHIPS:
 -------------------------
