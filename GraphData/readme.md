@@ -10,22 +10,22 @@ Cypher code loads the CSV data into neo4j
 OAI and Dublin Core Metadata Fields in DASH to map to Properties on Neo4j Nodes
 -------------------------------------------
 
-—- Entitites/Nodes —-
+## Entitites/Nodes
 * c:Creator
-	dc:creator
-* w:Work
-	oai:identifier
-	dc:title
-	dc:date (where date.issued is thought to be listed)
-	dc:publisher
-	dc:type
-	dc:description (where FAS department in listed)
+	* dc:creator
+### w:Work
+	* oai:identifier
+	* dc:title
+	* dc:date (where date.issued is thought to be listed)
+	* dc:publisher
+	* dc:type
+	* dc:description (where FAS department in listed)
 * s:Subject
-	dc:subject
+	* dc:subject
 	
--- Relationships --
-c:Creator-r:CREATED->w:Work
-w:Work-ISABOUT->s:Subject
+## Relationships
+* c:Creator-r:CREATED->w:Work
+* w:Work-ISABOUT->s:Subject
 
 
 -------------------------------------------
