@@ -2,9 +2,9 @@
 -----
 !ETL!
 -----
-Extract Data from DASH via XQuery OAI-PMH script
-XQuery transform the XML data into CSV data for load into neo4j
-Cypher code loads the CSV data into neo4j
+1. XQuery script extracts data from DASH via OAI-PMH.
+2. XQuery scripts transform the XML data into CSV data for load into neo4j.
+3. Cypher code loads the CSV data into neo4j from the command line using neo4j-shell.
 
 -------------------------------------------
 OAI and Dublin Core Metadata Fields in DASH to map to Properties on Neo4j Nodes
