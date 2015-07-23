@@ -7,8 +7,7 @@ XQuery transform the XML data into CSV data for load into neo4j
 Cypher code loads the CSV data into neo4j
 
 -------------------------------------------
-OAI and Dublin Core Metadata Fields in DASH 
-to map to Properties on Neo4j Nodes
+OAI and Dublin Core Metadata Fields in DASH to map to Properties on Neo4j Nodes
 -------------------------------------------
 
 —- Entitites/Nodes —-
