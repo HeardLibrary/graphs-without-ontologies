@@ -8,18 +8,16 @@ declare namespace dc = "http://purl.org/dc/elements/1.1/";
 let $records := fn:collection("OAI")//oai:record
 
 let $csv := element CSV{
-  for $record in $records
-  (:Record Identifier:)
-  let $recordID := $record//oai:identifier/text()
-  (:Topics:)
-  let $topics := for $each in ($record//dc:subject/text()) return fn:normalize-space($each)
-       
-for $topic in $topics return
+
+  let $subjects := fn:distinct-values($records//dc:subject/text())
+
+  for $subject in $subjects 
+  order by $subject 
+  return
     element record{
-      element recordIdentifier {$recordID},
-      element topicID {$topic}
+      element subject {fn:normalize-space($subject)}
   }
 }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/TopicRel.csv", $serialize)
+return file:write-text("[GitHub]/graphs-without-ontologies/GraphData/Subject.csv", $serialize)
