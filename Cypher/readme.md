@@ -61,3 +61,17 @@ where (first.id ="536869656265722C20537475617274"
 return other,b,co,a,first
 limit 30
 ```
+###Shortest Path Analysis
+
+```cypher
+match (a:Creator {name:"Shieber, Stuart"}), (s:Subject {subject:"Public Health"}) 
+with a,s
+match p = shortestPath(a-[*]-s), s--w--(c:Creator)
+return p,w,s,c
+```
+
+```cypher
+match (a:Creator {name:"Shieber, Stuart"}), (s:Subject {subject:"Public Health"}) 
+with a,s
+match p = allShortestPaths(a-[*]-s), s--w--(c:Creator)
+return p,w,s,c
