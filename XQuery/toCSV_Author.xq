@@ -5,7 +5,7 @@ declare namespace oai = "http://www.openarchives.org/OAI/2.0/";
 declare namespace oai_dc = "http://www.openarchives.org/OAI/2.0/oai_dc/";
 declare namespace dc = "http://purl.org/dc/elements/1.1/";  
 
-let $records := fn:collection("OAI")//oai:record
+let $records := fn:collection("OAI")//record
 
 let $csv := element CSV{
   
@@ -24,4 +24,4 @@ let $csv := element CSV{
 }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("[GitHub]/graphs-without-ontologies/GraphData/Author.csv", $serialize)
+return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/Author.csv", $serialize)
