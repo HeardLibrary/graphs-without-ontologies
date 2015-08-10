@@ -22,9 +22,7 @@ Fork and clone the graphs-without-ontologies repository. The XQuery directory co
 
 First, create new, empty BaseX database called "OAI". Run the [get-OAI-data](XQuery/get-OAI-data.xquery) script, adjusting the base url, metadata prefix, and set-spec variables as necessary.  
 
-```
 NB: the ```db:add``` function works on Mac OSX, but does not work on some Windows systems. If experiencing problems when using a Windows operating system, replace the ```add:db``` function with ```file:append-text```, save your results to the file system, and then import the XML documents into your database from the file system.
-```
 
 Next, run each of the other scripts in the XQuery directory. These will create the CSV documents you can use to load the data into Neo4j. Replace ```GitHub``` with the path to the forked repository on your machine. Use the Cypher code in the [GraphData/readme.md](GraphData/readme.md) to load the data into Neo4j.
 
