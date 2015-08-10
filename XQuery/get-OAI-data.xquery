@@ -34,7 +34,7 @@ declare function local:resume($base-url as xs:string, $token as xs:string) as do
 
 let $base-url := "http://dash.harvard.edu/oai/request" (: Harvard's DASH Repository :)
 let $verb := "?verb=ListRecords&amp;metadataPrefix=oai_dc"
-let $set-spec := "&amp;set=hdl_1_2" (:Harvard Business School - about 360 records:)
+let $set-spec := "&amp;set=hdl_1_3345929" (:Harvard Business School - about 360 records:)
 let $response := local:request($base-url, $verb, $set-spec)
 for $record in $response//oai:record
 let $id := $record/oai:header/oai:identifier/text()

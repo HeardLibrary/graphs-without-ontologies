@@ -13,13 +13,13 @@ declare function local:matches-any
    satisfies ($arg = $searchString)
  };
 
-let $records := fn:collection("OAI")//oai:record
+let $records := fn:collection("OAI")//record
 
   let $csv:=
     element workList{
         for $individual in $records
             (:Record Identifier:)
-            let $recordID := $individual//oai:identifier/text()
+            let $recordID := $individual//identifier/text()
             (:Date:)
             let $datePath := for $each in $individual//dc:date[fn:not(fn:contains(., "T"))]/text() return fn:substring($each, 1, 4)          
             let $date :=
@@ -82,4 +82,4 @@ let $records := fn:collection("OAI")//oai:record
        }
 
 let $serialize:= csv:serialize($csv, map { 'header': true(), 'separator':'comma' })
-return file:write-text("/Users/eddie/GitHub/graphs-without-ontologies/GraphData/Work.csv", $serialize)
+return file:write-text("[GitHub]/graphs-without-ontologies/GraphData/Work.csv", $serialize)
