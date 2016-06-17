@@ -23,7 +23,7 @@ order by Articles desc
 match (w:Work {publisher:"Elsevier"}) // change journal name as necessary
 where  w.department <> "null"
 return w.department as Department, count(*) as Articles
-order by Articles
+order by Articles desc
 ```
 
 ###Items with Co-Authors
@@ -46,7 +46,7 @@ match (first:Creator)-->(a:Work)<--(co:Creator),
 where (first.id ="536869656265722C20537475617274"
       or first.id="536869656265722C20537475617274204D2E")
       and not (other.id = "536869656265722C20537475617274204D2E" or other.id = "536869656265722C20537475617274")
-      and not first-->(:Work)<--other
+      and not (first)-->(:Work)<--(other)
 return other.name as name, count(distinct b) as frequency
 order by frequency desc
 ```
@@ -57,7 +57,7 @@ match (first:Creator)-->(a:Work)<--(co:Creator),
 where (first.id ="536869656265722C20537475617274"
       or first.id="536869656265722C20537475617274204D2E")
       and not (other.id = "536869656265722C20537475617274204D2E" or other.id = "536869656265722C20537475617274")
-      and not first-->(:Work)<--other
+      and not (first)-->(:Work)<--(other)
 return other,b,co,a,first
 limit 30
 ```
@@ -66,12 +66,13 @@ limit 30
 ```cypher
 match (a:Creator {name:"Shieber, Stuart"}), (s:Subject {subject:"Public Health"}) 
 with a,s
-match p = shortestPath(a-[*]-s), s--w--(c:Creator)
+match p = shortestPath((a)-[*]-(s)), (s)--(w)--(c:Creator)
 return p,w,s,c
 ```
 
 ```cypher
 match (a:Creator {name:"Shieber, Stuart"}), (s:Subject {subject:"Public Health"}) 
 with a,s
-match p = allShortestPaths(a-[*]-s), s--w--(c:Creator)
+match p = allShortestPaths((a)-[*]-(s)), (s)--(w)--(c:Creator)
 return p,w,s,c
+```
