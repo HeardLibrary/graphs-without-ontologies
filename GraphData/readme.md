@@ -4,7 +4,7 @@
 2. XQuery scripts transform the XML data into CSV data for load into neo4j.
 3. Cypher code loads the CSV data into neo4j from the command line using neo4j-shell.
 
-##  OAI and Dublin Core metadata fields in DASH mapped to properties on Neo4j Nodes
+##  Metadata fields in DASH mapped to properties on Neo4j Nodes
 ### Nodes
 #### c:Creator
 	* dc:creator
