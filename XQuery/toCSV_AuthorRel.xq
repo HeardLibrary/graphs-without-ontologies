@@ -10,7 +10,7 @@ let $records := fn:collection("OAI")//record
 let $csv := element CSV{
   for $record in $records
   (:Record Identifier:)
-  let $recordID := $record//oai:identifier/text()
+  let $recordID := $record/header/identifier/text()
     
   (:Creator ID:)
   let $creatorIDs := for $each in ($record//dc:creator/text()) return fn:normalize-space($each) => convert:string-to-hex()
