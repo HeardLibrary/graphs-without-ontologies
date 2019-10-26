@@ -1,6 +1,6 @@
-##Cypher Queries
+## Cypher Queries
 
-###Journal Publishing Profiles
+### Journal Publishing Profiles
 
 ```cypher
 // show distinct publishers with number of articles published
@@ -26,7 +26,7 @@ return w.department as Department, count(*) as Articles
 order by Articles desc
 ```
 
-###Items with Co-Authors
+### Items with Co-Authors
 
 ```cypher
 //show titles with most co-authors
@@ -37,7 +37,7 @@ return Title, Authors
 order by Authors descending
 ```
 
-###Recommendation Engine
+### Recommendation Engine
 The following queries are adapted from [Building a Recommendation Engine with Cypher in Two Minutes](http://neo4j.com/developer/guide-build-a-recommendation-engine/).
 
 ```cypher
@@ -61,7 +61,7 @@ where (first.id ="536869656265722C20537475617274"
 return other,b,co,a,first
 limit 30
 ```
-###Shortest Path Analysis
+### Shortest Path Analysis
 
 ```cypher
 match (a:Creator {name:"Shieber, Stuart"}), (s:Subject {subject:"Public Health"}) 
